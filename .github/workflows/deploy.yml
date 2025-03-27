@@ -1,0 +1,23 @@
+name: Build and Push Akaunting Image to ACR
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Login to Azure Container Registry
+      run: echo "${{ secrets.AZURE_ACR_PASSWORD }}" | docker login ${{ secrets.AZURE_ACR_NAME }}.azurecr.io -u ${{ secrets.AZURE_ACR_USERNAME }} --password-stdin
+
+    - name: Build Docker Image
+      run: docker build -t ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/akaunting:latest .
+
+    - name: Push Image to ACR
+      run: docker push ${{ secrets.AZURE_ACR_NAME }}.azurecr.io/akaunting:latest
